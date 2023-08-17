@@ -11,8 +11,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "nodemon index.js",
-    "backend": "json-server --watch db.json --port 5000"
+    "start": "nodemon index.js"
   },
   "keywords": [],
   "author": "",

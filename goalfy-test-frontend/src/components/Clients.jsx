@@ -4,9 +4,7 @@ import styled from "styled-components";
 
 const Table = styled.table`
 	width: 100%;
-	max-width: 1300px;
-	margin: 0 auto;
-	padding: 0 15px;
+	border-collapse: collapse;
 `;
 
 const Thead = styled.thead`
@@ -15,10 +13,7 @@ const Thead = styled.thead`
 `;
 
 const Tr = styled.tr`
-	display: flex;
-	flex-direction: row;
-	justify-content: space-between;
-	align-items: center;
+	text-align: left;
 `;
 
 const Th = styled.th`

@@ -1,0 +1,10 @@
+.modal__header {
+	background-color: #fff;
+}
+
+.modal__container {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 16px;
+}

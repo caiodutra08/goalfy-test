@@ -33,3 +33,64 @@ export const getQuantityClients = (_, res) => {
 		return res.status(200).json(data);
 	});
 };
+
+/**
+ * Função que cadastra um novo cliente no banco de dados MySQL
+ *
+ * @autor Caio Busarello Dutra
+ * @version 1.0.0
+ * @param {object} req - Requisição do cliente
+ * @param {object} res - Resposta do servidor
+ * @returns {object} - Retorna um objeto com o cliente cadastrado
+ */
+export const postClient = (req, res) => {
+	const q =
+		"INSERT INTO usuarios(`name`, `email`, `phone`, `cnpj`, `address`) VALUES (?, ?, ?, ?, ?)";
+	const { name, email, phone, cnpj, address } = req.body;
+
+	db.query(q, [name, email, phone, cnpj, address], (err, data) => {
+		if (err) return res.json(err);
+
+		return res.status(200).json(data);
+	});
+};
+
+/**
+ * Função que edita um cliente no banco de dados MySQL
+ *
+ * @autor Caio Busarello Dutra
+ * @version 1.0.0
+ * @param {object} req - Requisição do cliente
+ * @param {object} res - Resposta do servidor
+ * @returns {object} - Retorna um objeto com o cliente editado
+ */
+export const editClient = (req, res) => {
+	const q =
+		"UPDATE usuarios SET name = ?, email = ?, phone = ?, cnpj = ?, address = ? WHERE id = ?";
+	const { name, email, phone, cnpj, address, id } = req.body;
+
+	db.query(q, [name, email, phone, cnpj, address, id], (err, data) => {
+		if (err) return res.json(err);
+
+		return res.status(200).json(data);
+	});
+};
+
+/**
+ * Função que deleta um cliente no banco de dados MySQL
+ *
+ * @autor Caio Busarello Dutra
+ * @version 1.0.0
+ * @param {object} req - Requisição do cliente
+ * @param {object} res - Resposta do servidor
+ * @returns {object} - Retorna um objeto com o cliente deletado
+ */
+export const deleteClient = (req, res) => {
+	const q = "DELETE FROM clients WHERE `id` = ?";
+
+	db.query(q, [req.params.id], (err) => {
+		if (err) return res.json(err);
+
+		return res.status(200).json("Usuário deletado com sucesso.");
+	});
+};

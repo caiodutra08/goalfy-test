@@ -17,14 +17,15 @@
 }
 
 .modal__content {
-  display: absolute;
+  position: absolute;
 	z-index: 999;
   width: max-content;
   min-width: 491px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  border-radius: 4px;
+  border-radius: 0.3125rem;
   background-color: #fff;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  padding: 28px 24px;
 }

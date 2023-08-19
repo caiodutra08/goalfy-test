@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from "react";
-import Form from "./Form";
-import { Modal } from "./Modal";
+import ModalClient from "./Modals/ModalClient";
 import styled from "styled-components";
-import Clients from "./Clients";
+import ClientsTable from "./ClientsTable";
 import axios from "axios";
-import { BsPlus, BsBoxArrowUpRight } from "react-icons/bs";
 
 const Container = styled.div`
 	max-width: 1300px;
@@ -36,19 +34,18 @@ const Button = styled.button`
 const ClientsContainer = () => {
 	const [clientData, setClientData] = useState([]);
 	const [isOpen, setIsOpen] = useState(true);
+	const [edit, setEdit] = useState(null);
+
+	const getClients = async () => {
+		try {
+			const response = await axios.get("http://localhost:8000/clients");
+			setClientData(response.data);
+		} catch (error) {
+			console.error(error);
+		}
+	};
 
 	useEffect(() => {
-		async function getClients() {
-			try {
-				axios.get("http://localhost:8000/clients").then((response) => {
-					setClientData(response.data);
-					console.log(response.data);
-				});
-			} catch (error) {
-				console.error(error);
-			}
-		}
-
 		getClients();
 	}, [setClientData]);
 
@@ -60,34 +57,49 @@ const ClientsContainer = () => {
 		setIsOpen(false);
 	};
 
+	/**
+	 * Função que cadastra um novo cliente
+	 *
+	 * @author Caio Busarello Dutra
+	 * @version 1.0.0
+	 * @param {Event} e Evento de mudança de valor do input
+	 * @returns {void}
+	 */
+	const handleNewClient = async (e) => {
+		e.preventDefault();
+
+		const formData = new FormData(e.target);
+		const data = Object.fromEntries(formData);
+		axios
+			.post("http://localhost:8000/newclient", data)
+			.then((response) => {})
+			.catch((error) => {
+				console.error(error);
+			});
+	};
+
 	return (
 		<>
 			{isOpen && (
-				<Modal.Root>
-					<Modal.Header>
-						<Modal.Title>
-							<BsBoxArrowUpRight />
-							Novo Registro
-						</Modal.Title>
-						<Modal.Action onClick={handleCloseModal} title="close" className="btnClose">
-							<BsPlus />
-						</Modal.Action>
-					</Modal.Header>
-					<Modal.Content>
-						<Form />
-					</Modal.Content>
-					<Modal.Actions>
-						<Modal.Action onClick={handleCloseModal} className="btnCadastrar">
-							Cadastrar
-						</Modal.Action>
-					</Modal.Actions>
-				</Modal.Root>
+				<ModalClient
+					handleClient={handleNewClient}
+					handleCloseModal={handleCloseModal}
+					title={edit === null ? "Novo Cliente" : "Editar Cliente"}
+					btnTitle={edit === null ? "Cadastrar" : "Editar"}
+					client={edit}
+					setEdit={setEdit}
+					getClients={getClients}
+				/>
 			)}
 			<Container>
 				<Topbar>
 					<Button onClick={handleOpenModal}>Novo Registro</Button>
 				</Topbar>
-				<Clients clientData={clientData} />
+				<ClientsTable
+					clientData={clientData}
+					setClientData={setClientData}
+					setEdit={setEdit}
+				/>
 			</Container>
 		</>
 	);

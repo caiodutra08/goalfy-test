@@ -3,7 +3,7 @@ import styled from "styled-components";
 import axios from "axios";
 import { toast } from "react-toastify";
 
-const FormContainer = styled.div`
+const FormContainer = styled.form`
 	width: 100%;
 	max-width: 1200px;
 	margin: 0 auto;
@@ -30,7 +30,7 @@ const Input = styled.input`
 	font-size: 14px;
 `;
 
-const FormClient = ({ getClients, clientEdit, setEdit }) => {
+const FormClient = ({ getClients, clientEdit, setEdit, children, handleCloseModal }) => {
 	const ref = React.useRef();
 
 	React.useEffect(() => {
@@ -50,38 +50,44 @@ const FormClient = ({ getClients, clientEdit, setEdit }) => {
 
 		const client = ref.current;
 
-		if (
-			!client.name.value ||
-			!client.email.value
-		) {
-			alert("Preencha todos os campos!");
+		if (!client.name.value || !client.email.value) {
+			toast("Preencha todos os campos!", {
+				position: "top-right",
+				type: "error",
+			});
 			return;
 		}
 
 		const data = {};
 		data.name = client.name.value;
 		data.email = client.email.value;
-		data.phone = client.phone.value;
+		data.phone = client.phone.value.replace(/\D/g, "");
 		data.cnpj = client.cnpj.value;
 		data.address = client.address.value;
 
 		if (clientEdit) {
 			try {
 				await axios
-					.put(`http://localhost:8000/updateclient/${clientEdit.id}`, data)
+					.put(`http://localhost:8000/editclient/${clientEdit.id}`, data)
 					.then(({ data }) => {
-						alert("Cliente atualizado com sucesso!");
+						toast.success("Cliente editado com sucesso!", {
+							position: "top-right",
+							type: "success",
+						});
 					});
 			} catch (error) {
-				console.error(error);
+				toast.error("Erro ao editar cliente!");
 			}
 		} else {
 			try {
-				await axios.post("http://localhost:8000/createclient", data).then(({ data }) => {
-					alert("Cliente cadastrado com sucesso!");
+				await axios.post("http://localhost:8000/newclient", data).then(({ data }) => {
+					toast.success("Cliente cadastrado com sucesso!", {
+						position: "top-right",
+						type: "success",
+					});
 				});
 			} catch (error) {
-				console.error(error);
+				toast.error("Erro ao cadastrar cliente!");
 			}
 		}
 
@@ -93,6 +99,7 @@ const FormClient = ({ getClients, clientEdit, setEdit }) => {
 
 		setEdit(null);
 		getClients();
+		handleCloseModal();
 	};
 
 	/**
@@ -112,28 +119,31 @@ const FormClient = ({ getClients, clientEdit, setEdit }) => {
 	};
 
 	return (
-		<FormContainer ref={ref} onSubmit={handleSubmit}>
-			<FormControl>
-				<Label>Nome do Cliente</Label>
-				<Input type="text" name="name" />
-			</FormControl>
-			<FormControl>
-				<Label>Email</Label>
-				<Input type="email" name="email" />
-			</FormControl>
-			<FormControl>
-				<Label>Telefone</Label>
-				<Input maxLength={15} type="text" name="phone" onKeyUp={phoneMask} />
-			</FormControl>
-			<FormControl>
-				<Label>CNPJ</Label>
-				<Input type="text" name="cnpj" />
-			</FormControl>
-			<FormControl>
-				<Label>Endereço</Label>
-				<Input type="text" name="address" />
-			</FormControl>
-		</FormContainer>
+		<>
+			<FormContainer ref={ref} onSubmit={handleSubmit}>
+				<FormControl>
+					<Label>Nome do Cliente</Label>
+					<Input type="text" name="name" />
+				</FormControl>
+				<FormControl>
+					<Label>Email</Label>
+					<Input type="email" name="email" />
+				</FormControl>
+				<FormControl>
+					<Label>Telefone</Label>
+					<Input maxLength={15} type="text" name="phone" onKeyUp={phoneMask} />
+				</FormControl>
+				<FormControl>
+					<Label>CNPJ</Label>
+					<Input type="text" name="cnpj" />
+				</FormControl>
+				<FormControl>
+					<Label>Endereço</Label>
+					<Input type="text" name="address" />
+				</FormControl>
+				{children}
+			</FormContainer>
+		</>
 	);
 };
 

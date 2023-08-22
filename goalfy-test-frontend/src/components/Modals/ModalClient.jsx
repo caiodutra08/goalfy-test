@@ -4,7 +4,6 @@ import FormClient from "../FormClient";
 import { BsPlus, BsBoxArrowUpRight } from "react-icons/bs";
 
 export default function ModalClient({
-	handleClient,
 	handleCloseModal,
 	title,
 	btnTitle,
@@ -20,24 +19,27 @@ export default function ModalClient({
 						<BsBoxArrowUpRight />
 						{title}
 					</Modal.Title>
-					<Modal.Action onClick={handleCloseModal} title="close" className="btnClose">
+					<Modal.Action
+						onClick={() => handleCloseModal()}
+						title="close"
+						className="btnClose"
+					>
 						<BsPlus />
 					</Modal.Action>
 				</Modal.Header>
 				<Modal.Content>
-					<FormClient client={client} setEdit={setEdit} getClients={getClients} />
-					<Modal.Actions>
-						<Modal.Action
-							onClick={(e) => {
-								handleClient(e);
-								handleCloseModal();
-							}}
-							className="btnCadastrar"
-							type="submit"
-						>
-							{btnTitle}
-						</Modal.Action>
-					</Modal.Actions>
+					<FormClient
+						clientEdit={client}
+						setEdit={setEdit}
+						getClients={getClients}
+						handleCloseModal={handleCloseModal}
+					>
+						<Modal.Actions>
+							<Modal.Action className="btnCadastrar" type="submit">
+								{btnTitle}
+							</Modal.Action>
+						</Modal.Actions>
+					</FormClient>
 				</Modal.Content>
 			</Modal.Root>
 		</>

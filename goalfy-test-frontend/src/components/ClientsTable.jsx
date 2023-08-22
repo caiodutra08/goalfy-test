@@ -1,17 +1,19 @@
-import PropTypes from "prop-types";
 import React from "react";
-import { BsPen, BsTrashFill } from "react-icons/bs";
+import { BsAt, BsCardList, BsCursorText, BsPen, BsTelephone, BsTrashFill } from "react-icons/bs";
 import styled from "styled-components";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 const Table = styled.table`
 	width: 100%;
 	border-collapse: collapse;
+	border: 1px solid #e8e8e8;
 `;
 
 const Thead = styled.thead`
-	background-color: #232426;
-	color: #fff;
+	background-color: #fff;
+	color: #666d73;
+	border: 1px solid #e8e8e8;
 `;
 
 const Tr = styled.tr`
@@ -19,19 +21,30 @@ const Tr = styled.tr`
 `;
 
 const Th = styled.th`
-	padding: 10px;
+	padding: 16px;
+	font-size: 14px;
+	font-weight: 500;
+`;
+
+const Span = styled.span`
+	display: flex;
+	align-items: center;
+	gap: 4px;
 `;
 
 const Tbody = styled.tbody`
 	background-color: #fff;
 
-	&:hover ${Tr} {
+	//when hover the tr change the background color that the mouse is over
+	tr:hover {
 		background-color: #e9d9ff;
 	}
 `;
 
 const Td = styled.td`
-	padding: 10px;
+	padding: 16px;
+	font-size: 14px;
+	color: #363e40;
 `;
 
 const Button = styled.button`
@@ -54,19 +67,19 @@ const Button = styled.button`
 	}
 `;
 
-const ClientsTable = ({ clientData, setClientData, setEdit }) => {
-	
+const ClientsTable = ({ clientData, setClientData, setEdit, handleOpenModal }) => {
 	/**
 	 * Função que edita um cliente
-	 * 
+	 *
 	 * @autor Caio Busarello Dutra
 	 * @version 1.0.0
 	 * @param {Object} client Objeto com os dados do cliente
 	 * @returns {void}
 	 */
 	const handleEditClient = (client) => {
-		setEdit(client)
-	}
+		setEdit(client);
+		handleOpenModal(client);
+	};
 
 	/**
 	 * Função que deleta um cliente
@@ -77,58 +90,94 @@ const ClientsTable = ({ clientData, setClientData, setEdit }) => {
 	 * @returns {void}
 	 */
 	const handleDeleteClient = async (id) => {
-		await axios
-			.delete(`http://localhost:8000/deleteclient/${id}`)
-			.then(({ data }) => {
+		try {
+			await axios.delete(`http://localhost:8000/deleteclient/${id}`).then(({ data }) => {
 				const newClientData = clientData.filter((client) => client.id !== id);
 				setClientData(newClientData);
-			})
-			.catch((error) => {
-				console.error(error);
+				toast.success("Cliente deletado com sucesso!", {
+					position: "top-right",
+					type: "success",
+				});
 			});
+		} catch (error) {
+			toast.error("Erro ao deletar cliente!", {
+				position: "top-right",
+				type: "error",
+			});
+		}
 	};
 
 	return (
-		<Table>
-			<Thead>
-				<Tr>
-					<Th>Nome</Th>
-					<Th>Email</Th>
-					<Th>Telefone</Th>
-					<Th>CNPJ</Th>
-					<Th>Endereço</Th>
-					<Th align="center" colSpan="2">
-						Ações
-					</Th>
-				</Tr>
-			</Thead>
-			<Tbody>
-				{clientData.map((client) => (
-					<Tr key={client.id}>
-						<Td>{client.name}</Td>
-						<Td>{client.email}</Td>
-						<Td>{client.phone}</Td>
-						<Td>{client.cnpj}</Td>
-						<Td>{client.address}</Td>
-						<Td align="center">
-							<Button className="client__edit" onClick={() => handleEditClient(client)}>
-								Editar
-								<BsPen />
-							</Button>
-						</Td>
-						<Td align="center">
-							<Button
-								className="client__delete"
-								onClick={() => handleDeleteClient(client.id)}
-							>
-								Excluir
-								<BsTrashFill />
-							</Button>
-						</Td>
+		<>
+			<Table>
+				<Thead>
+					<Tr>
+						<Th>
+							<Span>
+								<BsCursorText />
+								Nome
+							</Span>
+						</Th>
+						<Th>
+							<Span>
+								<BsAt />
+								Email
+							</Span>
+						</Th>
+						<Th>
+							<Span>
+								<BsTelephone />
+								Telefone
+							</Span>
+						</Th>
+						<Th>
+							<Span>
+								<BsCardList />
+								CNPJ
+							</Span>
+						</Th>
+						<Th>
+							<Span>
+								<BsCursorText />
+								Endereço
+							</Span>
+						</Th>
+						<Th align="center" colSpan="2">
+							Ações
+						</Th>
 					</Tr>
-				))}
-			</Tbody>
-		</Table>
+				</Thead>
+				<Tbody>
+					{clientData.map((client) => (
+						<Tr key={client.id}>
+							<Td>{client.name}</Td>
+							<Td>{client.email}</Td>
+							<Td>{client.phone}</Td>
+							<Td>{client.cnpj}</Td>
+							<Td>{client.address}</Td>
+							<Td align="center">
+								<Button
+									className="client__edit"
+									onClick={() => handleEditClient(client)}
+								>
+									Editar
+									<BsPen />
+								</Button>
+							</Td>
+							<Td align="center">
+								<Button
+									className="client__delete"
+									onClick={() => handleDeleteClient(client.id)}
+								>
+									Excluir
+									<BsTrashFill />
+								</Button>
+							</Td>
+						</Tr>
+					))}
+				</Tbody>
+			</Table>
+		</>
 	);
 };
 

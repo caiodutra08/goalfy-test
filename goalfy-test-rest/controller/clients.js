@@ -45,7 +45,7 @@ export const getQuantityClients = (_, res) => {
  */
 export const postClient = (req, res) => {
 	const q =
-		"INSERT INTO usuarios(`name`, `email`, `phone`, `cnpj`, `address`) VALUES (?, ?, ?, ?, ?)";
+		"INSERT INTO clients(`name`, `email`, `phone`, `cnpj`, `address`) VALUES (?, ?, ?, ?, ?)";
 	const { name, email, phone, cnpj, address } = req.body;
 
 	db.query(q, [name, email, phone, cnpj, address], (err, data) => {
@@ -66,7 +66,7 @@ export const postClient = (req, res) => {
  */
 export const editClient = (req, res) => {
 	const q =
-		"UPDATE usuarios SET name = ?, email = ?, phone = ?, cnpj = ?, address = ? WHERE id = ?";
+		"UPDATE clients SET name = ?, email = ?, phone = ?, cnpj = ?, address = ? WHERE id = ?";
 	const { name, email, phone, cnpj, address, id } = req.body;
 
 	db.query(q, [name, email, phone, cnpj, address, id], (err, data) => {

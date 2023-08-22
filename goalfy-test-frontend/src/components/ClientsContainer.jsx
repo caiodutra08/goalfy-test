@@ -3,6 +3,7 @@ import ModalClient from "./Modals/ModalClient";
 import styled from "styled-components";
 import ClientsTable from "./ClientsTable";
 import axios from "axios";
+import { BsPlusCircle, BsSearch } from "react-icons/bs";
 
 const Container = styled.div`
 	max-width: 1300px;
@@ -29,11 +30,41 @@ const Button = styled.button`
 	justify-content: center;
 	align-items: center;
 	cursor: pointer;
+	gap: 8px;
+`;
+
+const H3 = styled.h3`
+	color: #949fa6;
+	font-size: 12px;
+	font-weight: 500;
+`;
+
+const Search = styled.div`
+	padding: 0.5rem;
+	position: relative;
+	display: flex;
+	align-items: center;
+	background-color: #f2f2f2;
+
+	svg {
+		color: #949fa6;
+	}
+`;
+
+const SearchBar = styled.input`
+	padding: 8px 8px 8px 28px;
+	background-color: #f2f2f2;
+	border: 1px solid #e8e8e8;
+	border-radius: 4px;
+
+	::placeholder {
+		color: #949fa6;
+	}
 `;
 
 const ClientsContainer = () => {
 	const [clientData, setClientData] = useState([]);
-	const [isOpen, setIsOpen] = useState(true);
+	const [isOpenClientModal, setIsOpenClientModal] = useState(false);
 	const [edit, setEdit] = useState(null);
 
 	const getClients = async () => {
@@ -49,41 +80,20 @@ const ClientsContainer = () => {
 		getClients();
 	}, [setClientData]);
 
-	const handleOpenModal = () => {
-		setIsOpen(true);
+	const handleOpenClientModal = (client = null) => {
+		setIsOpenClientModal(true);
+		setEdit(client);
 	};
 
-	const handleCloseModal = () => {
-		setIsOpen(false);
-	};
-
-	/**
-	 * Função que cadastra um novo cliente
-	 *
-	 * @author Caio Busarello Dutra
-	 * @version 1.0.0
-	 * @param {Event} e Evento de mudança de valor do input
-	 * @returns {void}
-	 */
-	const handleNewClient = async (e) => {
-		e.preventDefault();
-
-		const formData = new FormData(e.target);
-		const data = Object.fromEntries(formData);
-		axios
-			.post("http://localhost:8000/newclient", data)
-			.then((response) => {})
-			.catch((error) => {
-				console.error(error);
-			});
+	const handleCloseClientModal = () => {
+		setIsOpenClientModal(false);
 	};
 
 	return (
 		<>
-			{isOpen && (
+			{isOpenClientModal && (
 				<ModalClient
-					handleClient={handleNewClient}
-					handleCloseModal={handleCloseModal}
+					handleCloseModal={handleCloseClientModal}
 					title={edit === null ? "Novo Cliente" : "Editar Cliente"}
 					btnTitle={edit === null ? "Cadastrar" : "Editar"}
 					client={edit}
@@ -93,12 +103,25 @@ const ClientsContainer = () => {
 			)}
 			<Container>
 				<Topbar>
-					<Button onClick={handleOpenModal}>Novo Registro</Button>
+					<Button onClick={() => handleOpenClientModal()}>
+						<BsPlusCircle />
+						Novo Registro
+					</Button>
+					<Search>
+						<BsSearch style={{ marginLeft: "8px", position: "absolute" }} />
+						<SearchBar
+							id="search-bar"
+							type="text"
+							placeholder="Pesquisar..."
+						></SearchBar>
+					</Search>
+					<H3>{`${clientData.length} Registros`}</H3>
 				</Topbar>
 				<ClientsTable
 					clientData={clientData}
 					setClientData={setClientData}
 					setEdit={setEdit}
+					handleOpenModal={handleOpenClientModal}
 				/>
 			</Container>
 		</>

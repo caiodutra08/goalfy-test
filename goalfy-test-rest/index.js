@@ -1,5 +1,5 @@
 import express from "express";
-import clientsRoute from "./routes/clients.js";
+import clientsRoute from "./routes/client.route.js";
 import cors from "cors";
 
 const app = express();

@@ -31,6 +31,7 @@ const Input = styled.input`
 `;
 
 const FormClient = ({ getClients, clientEdit, setEdit, children, handleCloseModal }) => {
+	const [knowCEP, setKnowCEP] = React.useState(true);
 	const ref = React.useRef();
 
 	React.useEffect(() => {
@@ -42,6 +43,9 @@ const FormClient = ({ getClients, clientEdit, setEdit, children, handleCloseModa
 			client.phone.value = clientEdit.phone;
 			client.cnpj.value = clientEdit.cnpj;
 			client.address.value = clientEdit.address;
+			if (clientEdit.cep) {
+				client.cep.value = clientEdit.cep;
+			}
 		}
 	}, [clientEdit]);
 
@@ -51,7 +55,7 @@ const FormClient = ({ getClients, clientEdit, setEdit, children, handleCloseModa
 		const client = ref.current;
 
 		if (!client.name.value || !client.email.value) {
-			toast("Preencha todos os campos!", {
+			toast("Preencha todos os campos obrigatórios!", {
 				position: "top-right",
 				type: "error",
 			});
@@ -64,6 +68,13 @@ const FormClient = ({ getClients, clientEdit, setEdit, children, handleCloseModa
 		data.phone = client.phone.value.replace(/\D/g, "");
 		data.cnpj = client.cnpj.value;
 		data.address = client.address.value;
+		// get cep that is in address but after the ;
+		if (data.address) {
+			const cep = data.address.split(";")[1];
+			if (cep) {
+				data.cep = cep.replace(/\D/g, "");
+			}
+		}
 
 		if (clientEdit) {
 			try {
@@ -87,7 +98,6 @@ const FormClient = ({ getClients, clientEdit, setEdit, children, handleCloseModa
 					});
 				});
 			} catch (error) {
-				toast.error("Erro ao cadastrar cliente!");
 			}
 		}
 
@@ -118,16 +128,32 @@ const FormClient = ({ getClients, clientEdit, setEdit, children, handleCloseModa
 		e.target.value = phone;
 	};
 
+	/**
+	 * Função que verifica se o CEP é válido e preenche os campos de endereço
+	 * caso o CEP seja válido
+	 * @param {Event} e Evento de mudança de valor do input
+	 * @returns {void}
+	 * @version 1.0.0
+	 * @todo Verificar se o CEP é válido
+	 * @todo Preencher os campos de endereço
+	 * @todo Mostrar mensagem de erro caso o CEP seja inválido
+	 * @todo Mostrar mensagem de erro caso o CEP não seja encontrado
+	 */
+	const checkCEP = async (e) => {
+		const cep = e.target.value.replace(/\D/g, "");
+		console.log(cep);
+	};
+
 	return (
 		<>
 			<FormContainer ref={ref} onSubmit={handleSubmit}>
 				<FormControl>
-					<Label>Nome do Cliente</Label>
-					<Input type="text" name="name" />
+					<Label>Nome do Cliente *</Label>
+					<Input type="text" name="name" required />
 				</FormControl>
 				<FormControl>
-					<Label>Email</Label>
-					<Input type="email" name="email" />
+					<Label>Email *</Label>
+					<Input type="email" name="email" required />
 				</FormControl>
 				<FormControl>
 					<Label>Telefone</Label>
@@ -137,6 +163,12 @@ const FormClient = ({ getClients, clientEdit, setEdit, children, handleCloseModa
 					<Label>CNPJ</Label>
 					<Input type="text" name="cnpj" />
 				</FormControl>
+				{knowCEP && (
+					<FormControl>
+						<Label>CEP</Label>
+						<Input type="text" name="cep" onBlur={checkCEP} />
+					</FormControl>
+				)}
 				<FormControl>
 					<Label>Endereço</Label>
 					<Input type="text" name="address" />

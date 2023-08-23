@@ -1,15 +1,15 @@
 .modal__title {
-  font-size: 24px;
-  font-weight: 500;
-  color: #232426;
-  text-align: center;
-  display: flex;
+	font-size: 24px;
+	font-weight: 500;
+	color: #232426;
+	text-align: center;
+	display: flex;
 	align-items: center;
 	gap: 8px;
 }
 
 .modal__title svg {
-  width: 24px;
-  height: 24px;
-  fill: #7f23f7;
+	width: 24px;
+	height: 24px;
+	fill: #7f23f7;
 }

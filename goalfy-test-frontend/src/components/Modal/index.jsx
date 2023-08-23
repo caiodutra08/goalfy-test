@@ -10,6 +10,6 @@ export const Modal = {
 	Header: ModalHeader,
 	Title: ModalTitle,
 	Content: ModalContent,
-  Actions: ModalActions,
+	Actions: ModalActions,
 	Action: ModalAction,
 };

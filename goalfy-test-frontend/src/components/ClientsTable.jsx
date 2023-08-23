@@ -94,7 +94,7 @@ const ClientsTable = ({ clientData, setClientData, setEdit, handleOpenModal }) =
 			await axios.delete(`http://localhost:8000/deleteclient/${id}`).then(({ data }) => {
 				const newClientData = clientData.filter((client) => client.id !== id);
 				setClientData(newClientData);
-				toast.success("Cliente deletado com sucesso!", {
+				toast.success(`${data}`, {
 					position: "top-right",
 					type: "success",
 				});
@@ -148,33 +148,41 @@ const ClientsTable = ({ clientData, setClientData, setEdit, handleOpenModal }) =
 					</Tr>
 				</Thead>
 				<Tbody>
-					{clientData.map((client) => (
-						<Tr key={client.id}>
-							<Td>{client.name}</Td>
-							<Td>{client.email}</Td>
-							<Td>{client.phone}</Td>
-							<Td>{client.cnpj}</Td>
-							<Td>{client.address}</Td>
-							<Td align="center">
-								<Button
-									className="client__edit"
-									onClick={() => handleEditClient(client)}
-								>
-									Editar
-									<BsPen />
-								</Button>
-							</Td>
-							<Td align="center">
-								<Button
-									className="client__delete"
-									onClick={() => handleDeleteClient(client.id)}
-								>
-									Excluir
-									<BsTrashFill />
-								</Button>
+					{clientData.length > 0 ? (
+						clientData.map((client) => (
+							<Tr key={client.id}>
+								<Td>{client.name}</Td>
+								<Td>{client.email}</Td>
+								<Td>{client.phone}</Td>
+								<Td>{client.cnpj}</Td>
+								<Td>{client.address}</Td>
+								<Td align="center">
+									<Button
+										className="client__edit"
+										onClick={() => handleEditClient(client)}
+									>
+										Editar
+										<BsPen />
+									</Button>
+								</Td>
+								<Td align="center">
+									<Button
+										className="client__delete"
+										onClick={() => handleDeleteClient(client.id)}
+									>
+										Excluir
+										<BsTrashFill />
+									</Button>
+								</Td>
+							</Tr>
+						))
+					) : (
+						<Tr>
+							<Td colSpan="7" align="center">
+								Nenhum cliente cadastrado!
 							</Td>
 						</Tr>
-					))}
+					)}
 				</Tbody>
 			</Table>
 		</>

@@ -67,9 +67,17 @@ const ClientsContainer = () => {
 	const [isOpenClientModal, setIsOpenClientModal] = useState(false);
 	const [edit, setEdit] = useState(null);
 
+	/**
+	 * Função que busca os clientes
+	 *
+	 * @autor Caio Busarello Dutra
+	 * @version 1.0.0
+	 * @param {Object} response - Resposta da requisição
+	 * @returns {void}
+	 */
 	const getClients = async () => {
 		try {
-			const response = await axios.get("http://localhost:8000/clients");
+			const response = await axios.get("/clients");
 			setClientData(response.data);
 		} catch (error) {
 			console.error(error);

@@ -13,6 +13,13 @@ const FormControl = styled.div`
 	display: flex;
 	flex-direction: column;
 	margin-bottom: 15px;
+
+	&.knowCEP {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		gap: 8px;
+	}
 `;
 
 const Label = styled.label`
@@ -28,6 +35,66 @@ const Input = styled.input`
 	border-radius: 4px;
 	padding: 10px;
 	font-size: 14px;
+`;
+
+const Switch = styled.label`
+	position: relative;
+	display: inline-block;
+	width: 48px;
+	height: 24px;
+
+	input {
+		opacity: 0;
+		width: 0;
+		height: 0;
+	}
+
+	.slider {
+		position: absolute;
+		cursor: pointer;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background-color: #ccc;
+		-webkit-transition: 0.4s;
+		transition: 0.4s;
+	}
+
+	.slider:before {
+		position: absolute;
+		content: "";
+		height: 16px;
+		width: 16px;
+		left: 4px;
+		bottom: 4px;
+		background-color: white;
+		-webkit-transition: 0.4s;
+		transition: 0.4s;
+	}
+
+	input:checked + .slider {
+		background-color: #7f23f7;
+	}
+
+	input:focus + .slider {
+		box-shadow: 0 0 1px #7f23f7;
+	}
+
+	input:checked + .slider:before {
+		-webkit-transform: translateX(24px);
+		-ms-transform: translateX(24px);
+		transform: translateX(24px);
+	}
+
+	/* Rounded sliders */
+	.slider.round {
+		border-radius: 34px;
+	}
+
+	.slider.round:before {
+		border-radius: 50%;
+	}
 `;
 
 const FormClient = ({ getClients, clientEdit, setEdit, children, handleCloseModal }) => {
@@ -49,6 +116,14 @@ const FormClient = ({ getClients, clientEdit, setEdit, children, handleCloseModa
 		}
 	}, [clientEdit]);
 
+	/**
+	 * Função que manipula o envio do formulário de cadastro de cliente
+	 *
+	 * @author Caio Busarello Dutra
+	 * @version 1.0.0
+	 * @param {Event} e Evento de envio do formulário
+	 * @returns {void}
+	 */
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 
@@ -78,27 +153,25 @@ const FormClient = ({ getClients, clientEdit, setEdit, children, handleCloseModa
 
 		if (clientEdit) {
 			try {
-				await axios
-					.put(`http://localhost:8000/editclient/${clientEdit.id}`, data)
-					.then(({ data }) => {
-						toast.success("Cliente editado com sucesso!", {
-							position: "top-right",
-							type: "success",
-						});
-					});
-			} catch (error) {
-				toast.error("Erro ao editar cliente!");
-			}
-		} else {
-			try {
-				await axios.post("http://localhost:8000/newclient", data).then(({ data }) => {
-					toast.success("Cliente cadastrado com sucesso!", {
+				await axios.put(`/editclient/${clientEdit.id}`, data).then(({ data }) => {
+					console.log(data);
+					toast.success(`${data}`, {
 						position: "top-right",
 						type: "success",
 					});
 				});
 			} catch (error) {
+				toast.error("Erro ao editar cliente!");
 			}
+		} else {
+			try {
+				await axios.post("/newclient", data).then(({ data }) => {
+					toast.success(`${data}`, {
+						position: "top-right",
+						type: "success",
+					});
+				});
+			} catch (error) {}
 		}
 
 		client.name.value = "";
@@ -120,28 +193,35 @@ const FormClient = ({ getClients, clientEdit, setEdit, children, handleCloseModa
 	 * @param {Event} e Evento de mudança de valor do input
 	 * @returns {void}
 	 */
-	const phoneMask = (e) => {
+	function phoneMask(e) {
 		let phone = e.target.value;
 		phone = phone.replace(/\D/g, "");
 		phone = phone.replace(/^(\d{2})(\d)/g, "($1) $2");
 		phone = phone.replace(/(\d)(\d{4})$/, "$1-$2");
 		e.target.value = phone;
-	};
+	}
 
 	/**
-	 * Função que verifica se o CEP é válido e preenche os campos de endereço
-	 * caso o CEP seja válido
+	 * Função que busca o endereço do cliente pelo CEP
 	 * @param {Event} e Evento de mudança de valor do input
 	 * @returns {void}
 	 * @version 1.0.0
-	 * @todo Verificar se o CEP é válido
-	 * @todo Preencher os campos de endereço
-	 * @todo Mostrar mensagem de erro caso o CEP seja inválido
-	 * @todo Mostrar mensagem de erro caso o CEP não seja encontrado
 	 */
 	const checkCEP = async (e) => {
-		const cep = e.target.value.replace(/\D/g, "");
-		console.log(cep);
+		if (typeof e.target.value === String) {
+			const cep = e.target.value.replace(/\D/g, "");
+			axios
+				.get(`https://viacep.com.br/ws/${cep}/json/`)
+				.then(({ data }) => {
+					const client = ref.current;
+					client.address.value = `${data.logradouro}; Bairro: ${data.bairro}; Cidade: ${data.localidade}; Estado: ${data.uf}`;
+				})
+				.catch((error) => {
+					toast.error("CEP inválido!");
+				});
+		}
+
+		return;
 	};
 
 	return (
@@ -162,6 +242,18 @@ const FormClient = ({ getClients, clientEdit, setEdit, children, handleCloseModa
 				<FormControl>
 					<Label>CNPJ</Label>
 					<Input type="text" name="cnpj" />
+				</FormControl>
+				<FormControl className="knowCEP">
+					<Label>Conhece o CEP?</Label>
+					<Switch>
+						<input
+							type="checkbox"
+							name="knowCEP"
+							checked={knowCEP}
+							onChange={() => setKnowCEP(!knowCEP)}
+						/>
+						<span className="slider round"></span>
+					</Switch>
 				</FormControl>
 				{knowCEP && (
 					<FormControl>

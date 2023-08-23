@@ -2,7 +2,7 @@ import { db } from "./connection.js";
 export const ClientRepository = {};
 
 ClientRepository.getClients = async () => {
-	const q = "SELECT id, name, email, phone, cnpj, address FROM clients";
+	const q = "SELECT id, name, email, phone, cnpj, address, cep FROM clients";
 
 	const [row, fields] = await db.execute(q);
 
@@ -25,15 +25,11 @@ ClientRepository.countIfPhoneIsInUse = async (phone, id) => {
 
 ClientRepository.insertClient = async (client) => {
 	const q =
-		"INSERT INTO clients(`name`, `email`, `phone`, `cnpj`, `address`) VALUES (?, ?, ?, ?, ?)";
+		"INSERT INTO clients(`name`, `email`, `phone`, `cnpj`, `address`, `cep`) VALUES (?, ?, ?, ?, ?, ?)";
 
 	const { name, email, phone, cnpj, address, cep } = client;
 
-	if (cep) {
-		address += `; ${cep}`;
-	}
-
-	const [row, fields] = await db.execute(q, [name, email, phone, cnpj, address]);
+	const [row, fields] = await db.execute(q, [name, email, phone, cnpj, address, cep]);
 
 	return row;
 };
@@ -48,10 +44,10 @@ ClientRepository.getQuantityClients = async () => {
 
 ClientRepository.editClient = async (client, id) => {
 	const q =
-		"UPDATE clients SET name = ?, email = ?, phone = ?, cnpj = ?, address = ? WHERE id = ?";
-	const { name, email, phone, cnpj, address } = client;
+		"UPDATE clients SET name = ?, email = ?, phone = ?, cnpj = ?, address = ?, cep = ? WHERE id = ?";
+	const { name, email, phone, cnpj, address, cep } = client;
 
-	const [row, fields] = await db.execute(q, [name, email, phone, cnpj, address, id]);
+	const [row, fields] = await db.execute(q, [name, email, phone, cnpj, address, cep, id]);
 
 	return row;
 };
@@ -60,6 +56,6 @@ ClientRepository.deleteClient = async (id) => {
 	const q = "DELETE FROM clients WHERE `id` = ?";
 
 	const [row, fields] = await db.execute(q, [id]);
-	
+
 	return row;
 };

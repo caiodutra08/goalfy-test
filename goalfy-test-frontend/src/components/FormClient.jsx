@@ -110,9 +110,7 @@ const FormClient = ({ getClients, clientEdit, setEdit, children, handleCloseModa
 			client.phone.value = clientEdit.phone;
 			client.cnpj.value = clientEdit.cnpj;
 			client.address.value = clientEdit.address;
-			if (clientEdit.cep) {
-				client.cep.value = clientEdit.cep;
-			}
+			client.cep.value = clientEdit.cep;
 		}
 	}, [clientEdit]);
 
@@ -143,13 +141,7 @@ const FormClient = ({ getClients, clientEdit, setEdit, children, handleCloseModa
 		data.phone = client.phone.value.replace(/\D/g, "");
 		data.cnpj = client.cnpj.value;
 		data.address = client.address.value;
-		// get cep that is in address but after the ;
-		if (data.address) {
-			const cep = data.address.split(";")[1];
-			if (cep) {
-				data.cep = cep.replace(/\D/g, "");
-			}
-		}
+		data.cep = client.cep.value;
 
 		if (clientEdit) {
 			try {
@@ -178,6 +170,7 @@ const FormClient = ({ getClients, clientEdit, setEdit, children, handleCloseModa
 		client.phone.value = "";
 		client.cnpj.value = "";
 		client.address.value = "";
+		client.cep.value = "";
 
 		setEdit(null);
 		getClients();
@@ -207,18 +200,21 @@ const FormClient = ({ getClients, clientEdit, setEdit, children, handleCloseModa
 	 * @version 1.0.0
 	 */
 	const checkCEP = async (e) => {
-		if (typeof e.target.value === String) {
-			const cep = e.target.value.replace(/\D/g, "");
-			axios
-				.get(`https://viacep.com.br/ws/${cep}/json/`)
-				.then(({ data }) => {
-					const client = ref.current;
-					client.address.value = `${data.logradouro}; Bairro: ${data.bairro}; Cidade: ${data.localidade}; Estado: ${data.uf}`;
-				})
-				.catch((error) => {
+		const cep = e.target.value.replace(/\D/g, "");
+		await axios
+			.get(`https://viacep.com.br/ws/${cep}/json/`)
+			.then(({ data }) => {
+				if (data.erro) {
 					toast.error("CEP inválido!");
-				});
-		}
+					return;
+				}
+
+				const client = ref.current;
+				client.address.value = `${data.logradouro}; Bairro: ${data.bairro}; Cidade: ${data.localidade}; Estado: ${data.uf}`;
+			})
+			.catch((error) => {
+				toast.error("CEP inválido!");
+			});
 
 		return;
 	};
@@ -257,7 +253,7 @@ const FormClient = ({ getClients, clientEdit, setEdit, children, handleCloseModa
 				{knowCEP && (
 					<FormControl>
 						<Label>CEP</Label>
-						<Input type="text" name="cep" onBlur={checkCEP} />
+						<Input type="text" name="cep" onBlur={checkCEP} maxLength={8} />
 					</FormControl>
 				)}
 				<FormControl>

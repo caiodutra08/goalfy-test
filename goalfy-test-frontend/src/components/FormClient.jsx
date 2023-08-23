@@ -154,7 +154,6 @@ const FormClient = ({ getClients, clientEdit, setEdit, children, handleCloseModa
 		if (clientEdit) {
 			try {
 				await axios.put(`/editclient/${clientEdit.id}`, data).then(({ data }) => {
-					console.log(data);
 					toast.success(`${data}`, {
 						position: "top-right",
 						type: "success",
